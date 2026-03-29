@@ -1,0 +1,33 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+networking:
+  apiServerAddress: "127.0.0.1"
+  apiServerPort: 6445
+
+nodes:
+  # Primary Control Plane (ONLY one with port exposure)
+  - role: control-plane
+    labels:
+      node-id: control-node-1
+
+  # Secondary Control Plane (HA)
+  - role: control-plane
+    labels:
+      node-id: control-node-2
+
+  # Workers
+  - role: worker
+    labels:
+      node-role: worker
+      node-id: worker-1
+
+  - role: worker
+    labels:
+      node-role: worker
+      node-id: worker-2
+
+  - role: worker
+    labels:
+      node-role: worker
+      node-id: worker-3
