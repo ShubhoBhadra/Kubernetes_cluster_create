@@ -1,0 +1,38 @@
+version: '3.8' #Docker Compose file format version
+services:
+  # Master Node (Control Plane)
+  k8s-master:
+    image: rancher/k3s:v1.31.0-k3s1 #Using rancher image and k3s v1.31.0
+    container_name: k8s-master
+    privileged: true #It gives container full host-level capabilities because Kubernetes needs: cgroups, networking control, iptables.
+    ports:
+      - "127.0.0.1:6445:6443" #One cannot excess the cluster using the localhost:6445, because it is inside the docker container
+    command: server --node-name master --token=mukul-secret --disable traefik #This starts K3s in server mode (control plane)
+    tmpfs:
+      - /run
+      - /var/run
+
+  # Worker Nodes
+  worker-1:
+    image: rancher/k3s:v1.31.0-k3s1
+    container_name: k8s-worker-1
+    privileged: true
+    command: agent --server https://k8s-master:6443 --token=mukul-secret --node-name worker-1
+    depends_on:
+      - k8s-master
+
+  worker-2:
+    image: rancher/k3s:v1.31.0-k3s1
+    container_name: k8s-worker-2
+    privileged: true
+    command: agent --server https://k8s-master:6443 --token=mukul-secret --node-name worker-2
+    depends_on:
+      - k8s-master
+
+  worker-3:
+    image: rancher/k3s:v1.31.0-k3s1
+    container_name: k8s-worker-3
+    privileged: true
+    command: agent --server https://k8s-master:6443 --token=mukul-secret --node-name worker-3
+    depends_on:
+      - k8s-master
